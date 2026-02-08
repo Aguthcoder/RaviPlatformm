@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
+import SidebarContent from "@/components/SidebarContent";
 import { Menu, X } from "lucide-react";
 
 export default function DashboardLayout({
@@ -30,21 +31,23 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* سایدبار موبایل */}
+      {/* سایدبار موبایل - اصلاح شده */}
       <div
-        className={`fixed inset-y-0 right-0 w-72 bg-slate-900 z-50 transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 right-0 w-72 bg-[#111827] text-white z-50 transition-transform duration-300 lg:hidden flex flex-col ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
+        {/* دکمه بستن */}
         <button
           onClick={() => setIsMobileMenuOpen(false)}
-          className="absolute top-4 left-4 text-white hover:text-orange-500 transition"
+          className="absolute top-4 left-4 text-white/70 hover:text-white transition z-10"
+          aria-label="بستن منو"
         >
           <X size={24} />
         </button>
-        <div className="pt-16">
-          <Sidebar />
-        </div>
+
+        {/* محتوای Sidebar */}
+        <SidebarContent />
       </div>
 
       {/* محتوای اصلی */}
@@ -55,18 +58,17 @@ export default function DashboardLayout({
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="text-slate-600 hover:text-slate-900 transition"
+              aria-label="باز کردن منو"
             >
               <Menu size={24} />
             </button>
-            {/* لینک اسم راوی به صفحه اصلی - فقط اگر در صفحه اصلی نباشیم */}
-            {!isHomePage && (
+            {!isHomePage ? (
               <Link href="/" className="flex items-center gap-2 group">
                 <span className="font-black text-xl text-slate-900 group-hover:text-orange-600 transition-colors">
                   راوی
                 </span>
               </Link>
-            )}
-            {isHomePage && (
+            ) : (
               <span className="font-black text-xl text-slate-900">راوی</span>
             )}
           </div>
@@ -77,7 +79,6 @@ export default function DashboardLayout({
 
         {/* محتوای اسکرول */}
         <div className="flex-1 overflow-y-auto p-4 lg:p-8">
-          {/* دکمه بازگشت به صفحه اصلی در موبایل - فقط اگر در صفحه اصلی نباشیم */}
           {!isHomePage && (
             <div className="lg:hidden mb-4">
               <Link
