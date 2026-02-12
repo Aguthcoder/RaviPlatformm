@@ -13,9 +13,24 @@ export class ProfileEntity {
   @JoinColumn({ name: 'user_id' })
   user!: UserEntity;
 
+  @Column({ name: 'avatar_url', nullable: true })
+  avatarUrl?: string;
+
+  @Column({ type: 'text', nullable: true })
+  bio?: string;
+
   @Column({ name: 'interests', type: 'text', array: true, nullable: true })
   interests?: string[];
 
   @Column({ nullable: true })
   city?: string;
+
+  @Column({ type: 'smallint', nullable: true })
+  age?: number;
+
+  @Column({ nullable: true, length: 32 })
+  gender?: string;
+
+  @Column({ nullable: true, length: 120 })
+  education?: string;
 }

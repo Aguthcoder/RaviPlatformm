@@ -1,54 +1,166 @@
 "use client";
 
-import { useMemo } from "react";
-import { CheckCircle, MessageCircle, Sparkles, UserCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchUserProfile, updateUserProfile, UserProfile } from "@/lib/api";
 
-export default function UserProfile() {
-  const userOpinionScore = 82;
-  const eventOpinionScore = 76;
-  const matchPercent = useMemo(() => Math.round((userOpinionScore * 0.55) + (eventOpinionScore * 0.45)), []);
+const INITIAL_PROFILE: UserProfile = {
+  avatarUrl: "",
+  bio: "",
+  interests: [],
+  city: "",
+  age: null,
+  gender: "",
+  education: "",
+};
+
+export default function UserProfilePage() {
+  const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
+  const [interestsInput, setInterestsInput] = useState("");
+  const [status, setStatus] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await fetchUserProfile();
+        setProfile(data);
+        setInterestsInput(data.interests.join(", "));
+      } catch {
+        setStatus("اتصال به سرور برقرار نشد. اطلاعات نمونه نمایش داده می‌شود.");
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  function updateField<K extends keyof UserProfile>(key: K, value: UserProfile[K]) {
+    setProfile((previous) => ({ ...previous, [key]: value }));
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("");
+    setIsSaving(true);
+
+    try {
+      const payload = {
+        ...profile,
+        interests: interestsInput
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      };
+
+      const updated = await updateUserProfile(payload);
+      setProfile(updated);
+      setInterestsInput(updated.interests.join(", "));
+      setStatus("پروفایل با موفقیت ذخیره شد. این داده‌ها فقط برای مچ گروه/ایونت استفاده می‌شود.");
+    } catch {
+      setStatus("ذخیره‌سازی انجام نشد. لطفاً مجدد تلاش کنید.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
-    <div className="space-y-6 pb-10">
-      <div className="app-card rounded-3xl p-6 relative overflow-hidden">
-        <div className="absolute -top-8 -left-8 h-28 w-28 rounded-full bg-orange-500/25 blur-2xl" />
-        <div className="absolute -bottom-10 right-8 h-32 w-32 rounded-full bg-indigo-500/20 blur-2xl" />
-        <div className="relative flex items-center gap-4">
-          <div className="h-16 w-16 rounded-2xl bg-slate-800 border border-slate-600 flex items-center justify-center text-orange-400">
-            <UserCircle2 className="h-10 w-10" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black text-white">پروفایل کاربری</h1>
-            <p className="text-slate-300 text-sm mt-1">بررسی تطابق، عملکرد و وضعیت همنشینی‌ها</p>
-          </div>
-        </div>
+    <div className="max-w-3xl mx-auto pb-10 space-y-6">
+      <div className="app-card rounded-3xl p-6">
+        <h1 className="text-2xl font-black text-white">پروفایل برای مچ گروهی</h1>
+        <p className="text-sm text-slate-300 mt-2">
+          این پروفایل صرفاً برای پیشنهاد گروه‌ها و ایونت‌ها استفاده می‌شود و هیچ فیلد مرتبط با چت ندارد.
+        </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="app-card rounded-2xl p-5 flex items-center gap-4">
-          <MessageCircle className="text-orange-400" />
-          <div>
-            <p className="text-xs text-slate-300">پیام‌های نخوانده</p>
-            <p className="text-2xl font-black text-white">۱۲</p>
-          </div>
+      <form onSubmit={onSubmit} className="app-card rounded-3xl p-6 space-y-4">
+        <label className="block space-y-2">
+          <span className="text-sm text-slate-200">Avatar URL</span>
+          <input
+            value={profile.avatarUrl ?? ""}
+            onChange={(event) => updateField("avatarUrl", event.target.value)}
+            className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            placeholder="https://cdn.example.com/avatar.jpg"
+          />
+        </label>
+
+        <label className="block space-y-2">
+          <span className="text-sm text-slate-200">Bio</span>
+          <textarea
+            value={profile.bio ?? ""}
+            onChange={(event) => updateField("bio", event.target.value)}
+            className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white min-h-24"
+            maxLength={500}
+          />
+        </label>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <label className="block space-y-2">
+            <span className="text-sm text-slate-200">City</span>
+            <input
+              value={profile.city ?? ""}
+              onChange={(event) => updateField("city", event.target.value)}
+              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            />
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm text-slate-200">Age</span>
+            <input
+              type="number"
+              min={18}
+              max={99}
+              value={profile.age ?? ""}
+              onChange={(event) => updateField("age", event.target.value ? Number(event.target.value) : null)}
+              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            />
+          </label>
         </div>
 
-        <div className="app-card rounded-2xl p-5 flex items-center gap-4">
-          <CheckCircle className="text-orange-400" />
-          <div>
-            <p className="text-xs text-slate-300">تطابق موفق</p>
-            <p className="text-2xl font-black text-white">{matchPercent}%</p>
-          </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <label className="block space-y-2">
+            <span className="text-sm text-slate-200">Gender</span>
+            <select
+              value={profile.gender ?? ""}
+              onChange={(event) => updateField("gender", event.target.value)}
+              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            >
+              <option value="">انتخاب کنید</option>
+              <option value="male">male</option>
+              <option value="female">female</option>
+              <option value="non-binary">non-binary</option>
+              <option value="prefer-not-to-say">prefer-not-to-say</option>
+            </select>
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm text-slate-200">Education</span>
+            <input
+              value={profile.education ?? ""}
+              onChange={(event) => updateField("education", event.target.value)}
+              className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            />
+          </label>
         </div>
 
-        <div className="app-card rounded-2xl p-5 flex items-center gap-4">
-          <Sparkles className="text-orange-400" />
-          <div>
-            <p className="text-xs text-slate-300">سطح اعتماد پروفایل</p>
-            <p className="text-2xl font-black text-white">A+</p>
-          </div>
-        </div>
-      </div>
+        <label className="block space-y-2">
+          <span className="text-sm text-slate-200">Interests (comma separated tags)</span>
+          <input
+            value={interestsInput}
+            onChange={(event) => setInterestsInput(event.target.value)}
+            className="w-full rounded-xl bg-slate-900 border border-slate-700 px-4 py-2 text-white"
+            placeholder="tech, hiking, language-exchange"
+          />
+        </label>
+
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="rounded-xl bg-orange-500 hover:bg-orange-400 disabled:bg-orange-500/50 text-white px-5 py-2 font-semibold"
+        >
+          {isSaving ? "در حال ذخیره..." : "ذخیره پروفایل"}
+        </button>
+
+        {status ? <p className="text-sm text-slate-300">{status}</p> : null}
+      </form>
     </div>
   );
 }
