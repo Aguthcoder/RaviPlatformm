@@ -43,13 +43,17 @@ export default function EventsPage() {
         </div>
 
         <section className="mb-8 grid grid-cols-3 gap-3">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <Link
               key={category.id}
               href={`/events/category/${category.id}`}
               className="rounded-2xl border border-slate-700 bg-slate-900 p-3 text-center shadow-xl transition hover:-translate-y-1"
             >
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-800 text-orange-400">
+              <div
+                className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl ${
+                  index % 2 === 0 ? "bg-[#102647] text-orange-400" : "bg-orange-500/15 text-[#102647]"
+                }`}
+              >
                 <category.icon className="h-8 w-8" />
               </div>
               <p className="text-sm font-bold text-white">{category.title}</p>

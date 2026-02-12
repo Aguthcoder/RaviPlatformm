@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getCategoryById, getEventById } from "@/lib/events-catalog";
 import { getTopicImage } from "@/lib/dynamic-images";
 
 export default function BookingPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const event = getEventById(params.id);
   const category = getCategoryById(event?.categoryId ?? "hamneshin");
 
@@ -57,7 +58,12 @@ export default function BookingPage() {
         <aside className="app-card rounded-3xl p-6">
           <p className="text-sm text-slate-300">هزینه ثبت‌نام</p>
           <p className="text-2xl font-black mt-1">۴۵۰,۰۰۰ تومان</p>
-          <button className="w-full bg-orange-500 text-white rounded-xl py-3 mt-6">تکمیل رزرو</button>
+          <button
+            onClick={() => router.push(`/payment-success?eventId=${params.id}`)}
+            className="w-full bg-orange-500 text-white rounded-xl py-3 mt-6"
+          >
+            تکمیل رزرو
+          </button>
           <Link href="/events" className="block text-center mt-3 text-slate-300 text-sm">بازگشت</Link>
         </aside>
       </div>

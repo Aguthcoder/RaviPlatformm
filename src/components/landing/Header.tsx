@@ -54,24 +54,13 @@ export default function Header() {
           >
             خانه
           </Link>
-          <Link href="/about" className="hover:text-orange-300 transition">
-            درباره ما
-          </Link>
           <Link href="/events" className="hover:text-orange-300 transition">
-            رویدادها
+            رزرو
           </Link>
           {isLoggedIn && (
-            <>
-              {/* <Link
-                href="/dashboard"
-                className="hover:text-orange-300 transition"
-              >
-                داشبورد
-              </Link> */}
-              <Link href="/chat" className="hover:text-orange-300 transition">
-                چت‌ها
-              </Link>
-            </>
+            <Link href="/dashboard" className="hover:text-orange-300 transition">
+              داشبورد
+            </Link>
           )}
         </nav>
 
@@ -131,18 +120,11 @@ export default function Header() {
           )}
 
           <Link
-            href="/about"
-            className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            درباره ما
-          </Link>
-          <Link
             href="/events"
             className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
             onClick={() => setMobileMenuOpen(false)}
           >
-            رویدادها
+            رزرو
           </Link>
 
           {isLoggedIn ? (
@@ -162,13 +144,6 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   پروفایل
-                </Link>
-                <Link
-                  href="/chat"
-                  className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  چت‌ها
                 </Link>
               </div>
             </>

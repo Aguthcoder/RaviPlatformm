@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, User, Wallet, UserPlus, Gamepad2 } from "lucide-react";
+import { LayoutDashboard, CalendarDays, User, Wallet, UserPlus, House } from "lucide-react";
 
 export default function SidebarContent() {
   const pathname = usePathname();
   const menuItems = [
-    { name: "داشبورد", icon: LayoutDashboard, path: "/dashboard" },
+    { name: "صفحه اصلی", icon: House, path: "/" },
     { name: "رزرو همنشینی", icon: CalendarDays, path: "/events" },
-    { name: "بازی‌ها", icon: Gamepad2, path: "/games" },
+    { name: "داشبورد", icon: LayoutDashboard, path: "/dashboard" },
     { name: "کیف پول", icon: Wallet, path: "/dashboard/wallet" },
     { name: "دعوت دوستان", icon: UserPlus, path: "/dashboard/invite" },
     { name: "پروفایل", icon: User, path: "/dashboard/profile" },

@@ -3,16 +3,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, LayoutDashboard, User } from "lucide-react";
+import { Home, Calendar, LayoutDashboard } from "lucide-react";
 
 export default function MobileNavbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { icon: Home, label: "خانه", href: "/" },
-    { icon: Calendar, label: "رویدادها", href: "/events" },
+    { icon: Home, label: "صفحه اصلی", href: "/" },
+    { icon: Calendar, label: "رزرو", href: "/events" },
     { icon: LayoutDashboard, label: "داشبورد", href: "/dashboard" },
-    { icon: User, label: "پروفایل", href: "/dashboard/profile" },
   ];
 
   return (
