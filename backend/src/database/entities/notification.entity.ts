@@ -20,8 +20,14 @@ export class NotificationEntity {
   @Column({ name: 'body' })
   body!: string;
 
+  @Column({ name: 'metadata', type: 'jsonb', nullable: true })
+  metadata!: Record<string, unknown> | null;
+
   @Column({ name: 'is_read', default: false })
   isRead!: boolean;
+
+  @Column({ name: 'read_at', type: 'timestamptz', nullable: true })
+  readAt!: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

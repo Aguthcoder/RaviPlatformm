@@ -142,6 +142,13 @@ export async function fetchNotifications() {
   return apiRequest<{ unread: number; items: NotificationItem[] }>('/notifications');
 }
 
+export async function markNotificationsRead(ids?: string[]) {
+  return apiRequest<{ updated: number; unread: number }>('/notifications/read', {
+    method: 'POST',
+    body: JSON.stringify({ ids }),
+  });
+}
+
 export async function fetchSubscription() {
   return apiRequest<{ plan: string; features: string[] }>('/subscriptions/me');
 }

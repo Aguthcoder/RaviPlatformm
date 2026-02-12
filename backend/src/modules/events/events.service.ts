@@ -102,8 +102,12 @@ export class EventsService {
     await this.notificationsService.createNotification({
       userId,
       type: 'event',
-      title: 'رزرو با موفقیت انجام شد',
-      body: `${safeSeats} صندلی برای رویداد «${result.event.title}» رزرو شد.`,
+      title: 'یادآوری رویداد',
+      body: `رزرو شما برای «${result.event.title}» ثبت شد. زمان شروع: ${result.event.startDate.toLocaleString('fa-IR')}`,
+      metadata: {
+        eventId: result.event.id,
+        seats: safeSeats,
+      },
     });
 
     return result;
