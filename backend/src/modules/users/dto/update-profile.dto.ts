@@ -30,6 +30,25 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsString()
+  @Length(1, 32)
+  personalityType?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(8)
+  @IsString({ each: true })
+  @Length(2, 30, { each: true })
+  personalityTraits?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @Length(2, 30, { each: true })
+  preferredEventTypes?: string[];
+
+  @IsOptional()
+  @IsString()
   @Length(1, 80)
   city?: string;
 
