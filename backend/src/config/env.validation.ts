@@ -1,0 +1,28 @@
+import * as Joi from 'joi';
+
+export const envValidationSchema = Joi.object({
+  NODE_ENV: Joi.string().valid('development', 'test', 'production').required(),
+  PORT: Joi.number().port().default(4000),
+  CORS_ORIGINS: Joi.string().required(),
+  DB_HOST: Joi.string().required(),
+  DB_PORT: Joi.number().port().required(),
+  DB_USERNAME: Joi.string().required(),
+  DB_PASSWORD: Joi.string().required(),
+  DB_DATABASE: Joi.string().required(),
+  REDIS_HOST: Joi.string().required(),
+  REDIS_PORT: Joi.number().port().required(),
+  REDIS_PASSWORD: Joi.string().allow('').optional(),
+  JWT_ACCESS_SECRET: Joi.string().min(32).required(),
+  JWT_REFRESH_SECRET: Joi.string().min(32).required(),
+  JWT_EXPIRES_IN: Joi.string().required(),
+  JWT_REFRESH_EXPIRES_IN: Joi.string().required(),
+  OTP_SECRET: Joi.string().min(32).required(),
+  OTP_EXPIRES_SECONDS: Joi.number().integer().min(60).default(120),
+  OTP_RATE_LIMIT_SECONDS: Joi.number().integer().min(30).default(60),
+  SMTP_HOST: Joi.string().required(),
+  SMTP_PORT: Joi.number().port().required(),
+  SMTP_USER: Joi.string().required(),
+  SMTP_PASS: Joi.string().required(),
+  MAX_FILE_SIZE: Joi.number().integer().min(1024).required(),
+  BCRYPT_ROUNDS: Joi.number().integer().min(10).max(15).default(12),
+});
