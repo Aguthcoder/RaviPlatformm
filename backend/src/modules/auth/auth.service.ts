@@ -109,7 +109,9 @@ export class AuthService {
   refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') ??
+          this.configService.getOrThrow<string>('JWT_SECRET'),
       });
       return this.issueTokens(payload.sub, payload.mobileNumber, payload.email);
     } catch {
@@ -121,11 +123,15 @@ export class AuthService {
     const payload = { sub, mobileNumber, email };
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.getOrThrow<string>('JWT_EXPIRES_IN'),
+        secret:
+          this.configService.get<string>('JWT_SECRET') ??
+          this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        expiresIn: this.configService.getOrThrow<string>('JWT_EXPIRES'),
       }),
       refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') ??
+          this.configService.getOrThrow<string>('JWT_SECRET'),
         expiresIn: this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRES_IN'),
       }),
     };

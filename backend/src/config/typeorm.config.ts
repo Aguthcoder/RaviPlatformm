@@ -5,11 +5,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
   inject: [ConfigService],
   useFactory: (configService: ConfigService) => ({
     type: 'postgres' as const,
-    host: configService.getOrThrow<string>('DB_HOST'),
-    port: configService.getOrThrow<number>('DB_PORT'),
-    username: configService.getOrThrow<string>('DB_USERNAME'),
-    password: configService.getOrThrow<string>('DB_PASSWORD'),
-    database: configService.getOrThrow<string>('DB_DATABASE'),
+    url: configService.getOrThrow<string>('DATABASE_URL'),
     autoLoadEntities: true,
     synchronize: false,
     ssl:
@@ -17,5 +13,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         ? { rejectUnauthorized: false }
         : false,
     logging: configService.getOrThrow<string>('NODE_ENV') !== 'production',
+    migrations: ['dist/database/migrations/*.js'],
+    migrationsRun: false,
   }),
 };

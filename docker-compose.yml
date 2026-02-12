@@ -3,10 +3,10 @@ version: '3.9'
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     env_file:
-      - .env
+      - ./backend/.env
     ports:
       - '4000:4000'
     depends_on:
@@ -15,7 +15,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - .:/app
+      - ./backend:/app
       - /app/node_modules
     restart: unless-stopped
 
@@ -29,7 +29,7 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres -d ravi']
       interval: 10s
