@@ -1,15 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { BookingEntity } from '../../database/entities/booking.entity';
 import { EventEntity } from '../../database/entities/event.entity';
-import { EventReservationEntity } from '../../database/entities/event-reservation.entity';
-import { TelegramGroupEntity } from '../../database/entities/telegram-group.entity';
-import { NotificationsService } from '../notifications/notifications.service';
-
-type UpcomingEventsFilter = {
-  category?: string;
-  limit?: number;
-};
 
 @Injectable()
 export class EventsService {
@@ -17,95 +10,59 @@ export class EventsService {
     private readonly dataSource: DataSource,
     @InjectRepository(EventEntity)
     private readonly eventRepository: Repository<EventEntity>,
-    private readonly notificationsService: NotificationsService,
+    @InjectRepository(BookingEntity)
+    private readonly bookingRepository: Repository<BookingEntity>,
   ) {}
 
-  async getUpcomingActiveEvents(filter: UpcomingEventsFilter = {}): Promise<EventEntity[]> {
+  async getUpcomingActiveEvents(category?: string, limit = 50): Promise<EventEntity[]> {
     const query = this.eventRepository
       .createQueryBuilder('event')
-      .where('event.is_active = :isActive', { isActive: true })
+      .where('event.is_active = true')
       .andWhere('event.start_date > NOW()')
-      .orderBy('event.start_date', 'ASC');
+      .orderBy('event.start_date', 'ASC')
+      .limit(Math.max(1, Math.min(limit, 100)));
 
-    if (filter.category) {
-      query.andWhere('event.category = :category', { category: filter.category });
-    }
-
-    const safeLimit = Math.min(Math.max(filter.limit ?? 50, 1), 100);
-    query.limit(safeLimit);
-
+    if (category) query.andWhere('event.category = :category', { category });
     return query.getMany();
   }
 
-  async reserve(
-    userId: string,
-    eventId: string,
-    seats: number,
-    paymentReference?: string,
-  ): Promise<{ reservation: EventReservationEntity; event: EventEntity; remaining: number; telegramInviteLink: string }> {
-    const safeSeats = Math.max(1, Math.min(seats, 5));
-    const result = await this.dataSource.transaction(async (manager) => {
+  async createBooking(userId: string, eventId: string): Promise<BookingEntity> {
+    return this.dataSource.transaction(async (manager) => {
       const event = await manager.findOne(EventEntity, {
         where: { id: eventId },
         lock: { mode: 'pessimistic_write' },
       });
+      if (!event) throw new NotFoundException('Event not found');
+      if (!event.isActive) throw new BadRequestException('Event is inactive');
+      if (event.reservedCount >= event.capacity) throw new BadRequestException('Event capacity reached');
 
-      if (!event) {
-        throw new NotFoundException('Event not found');
-      }
-
-      if (event.price > 0 && !paymentReference) {
-        throw new BadRequestException('Payment is required to reserve this event');
-      }
-
-      const existingReservation = await manager.findOne(EventReservationEntity, {
+      const existing = await manager.findOne(BookingEntity, {
         where: { eventId, userId },
       });
-      if (existingReservation) {
-        throw new BadRequestException('You already booked this event');
-      }
+      if (existing) throw new BadRequestException('User already has booking for this event');
 
-      const remaining = event.capacity - event.reservedCount;
-      if (remaining < safeSeats) {
-        throw new BadRequestException('Not enough capacity');
-      }
-
-      const telegramGroup = await manager.findOne(TelegramGroupEntity, {
-        where: { eventId: event.id },
-      });
-      if (!telegramGroup) {
-        throw new BadRequestException('Telegram group is not configured for this event');
-      }
-
-      event.reservedCount += safeSeats;
+      event.reservedCount += 1;
       await manager.save(event);
 
-      const reservation = await manager.save(
-        manager.create(EventReservationEntity, {
-          userId,
+      return manager.save(
+        manager.create(BookingEntity, {
           eventId,
-          seats: safeSeats,
-          paymentStatus: 'paid',
-          paymentReference,
-          paidAt: new Date(),
+          userId,
+          status: event.price > 0 ? 'pending' : 'confirmed',
+          paymentStatus: event.price > 0 ? 'unpaid' : 'paid',
+          amountPaid: event.price > 0 ? undefined : '0',
+          confirmedAt: event.price > 0 ? undefined : new Date(),
+          bookingCode: `RV-${Date.now().toString(36).toUpperCase()}`,
         }),
       );
-
-      return {
-        reservation,
-        event,
-        remaining: event.capacity - event.reservedCount,
-        telegramInviteLink: telegramGroup.inviteLink,
-      };
     });
+  }
 
-    await this.notificationsService.createNotification({
-      userId,
-      type: 'event',
-      title: 'رزرو با موفقیت انجام شد',
-      body: `${safeSeats} صندلی برای رویداد «${result.event.title}» رزرو شد.`,
+  listMyBookings(userId: string) {
+    return this.bookingRepository.find({
+      where: { userId },
+      relations: ['event'],
+      order: { createdAt: 'DESC' },
     });
-
-    return result;
   }
 }

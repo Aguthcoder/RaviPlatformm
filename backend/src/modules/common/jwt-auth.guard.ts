@@ -1,37 +1,33 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 type RequestWithUser = {
   headers: Record<string, string | undefined>;
-  user?: { sub: string; mobileNumber: string };
+  user?: { sub: string; mobileNumber?: string; email?: string };
 };
-
-function extractCookieValue(cookieHeader: string | undefined, key: string) {
-  if (!cookieHeader) return null;
-
-  const item = cookieHeader
-    .split(';')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${key}=`));
-
-  return item ? decodeURIComponent(item.split('=')[1] ?? '') : null;
-}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
-    const token = extractCookieValue(req.headers.cookie, 'accessToken');
+    const cookieHeader = req.headers.cookie ?? '';
+    const token = cookieHeader
+      .split(';')
+      .map((part) => part.trim())
+      .find((part) => part.startsWith('accessToken='))
+      ?.split('=')[1];
 
-    if (!token) {
-      throw new UnauthorizedException('Missing access token cookie');
-    }
+    if (!token) throw new UnauthorizedException('Missing access token cookie');
 
     try {
-      req.user = this.jwtService.verify<{ sub: string; mobileNumber: string }>(token, {
-        secret: process.env.JWT_ACCESS_SECRET || 'ravi_access_secret',
+      req.user = this.jwtService.verify(token, {
+        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
       });
       return true;
     } catch {

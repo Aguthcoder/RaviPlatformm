@@ -34,14 +34,17 @@ export class EventEntity {
   @Column({ name: 'capacity', type: 'int', default: 20 })
   capacity!: number;
 
-  @Column({ name: 'reserved_count', type: 'int', default: 0 })
+  @Column({ name: 'current_bookings', type: 'int', default: 0 })
   reservedCount!: number;
 
-  @Column({ name: 'price', type: 'int', default: 0 })
+  @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2, default: 0 })
   price!: number;
 
   @Column({ name: 'start_date', type: 'timestamp' })
   startDate!: Date;
+
+  @Column({ name: 'end_date', type: 'timestamp', nullable: true })
+  endDate?: Date;
 
   @OneToMany(() => EventReservationEntity, (reservation) => reservation.event)
   reservations?: EventReservationEntity[];
