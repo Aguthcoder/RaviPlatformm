@@ -72,7 +72,7 @@ export default function CountdownTimer({
     <div className="w-full flex flex-col items-center gap-3">
       <div className="flex items-center gap-2 text-slate-600 font-bold text-xs md:text-sm bg-white/50 px-3 py-1 rounded-full border border-slate-100 backdrop-blur-sm">
         <Clock className="text-orange-500" size={16} />
-        <span>زمان باقی‌مانده تا رویداد بعدی</span>
+        <span>زمان باقی‌مانده تا همنشینی بعدی</span>
       </div>
 
       <div className="flex flex-row-reverse items-center gap-3">

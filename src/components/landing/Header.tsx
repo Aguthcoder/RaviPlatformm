@@ -58,7 +58,7 @@ export default function Header() {
             درباره ما
           </Link>
           <Link href="/events" className="hover:text-slate-900 transition">
-            رویدادها
+            همنشینیها
           </Link>
           {isLoggedIn && (
             <>
@@ -142,7 +142,7 @@ export default function Header() {
             className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
             onClick={() => setMobileMenuOpen(false)}
           >
-            رویدادها
+            همنشینیها
           </Link>
 
           {isLoggedIn ? (

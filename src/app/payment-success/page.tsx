@@ -18,7 +18,7 @@ export default function PaymentSuccessPage() {
           پرداخت موفقیت‌آمیز بود!
         </h1>
         <p className="text-slate-500 mb-12 text-lg max-w-lg mx-auto leading-relaxed">
-          رزرو شما برای رویداد قطعی شد. هم‌اکنون می‌توانید با سایر شرکت‌کنندگان
+          رزرو شما برای همنشینی قطعی شد. هم‌اکنون می‌توانید با سایر شرکت‌کنندگان
           که هوش مصنوعی برای شما انتخاب کرده، آشنا شوید.
         </p>
 
@@ -36,7 +36,7 @@ export default function PaymentSuccessPage() {
               تلگرام
             </h3>
             <p className="text-sm text-slate-500 group-hover:text-blue-50 mb-6">
-              عضویت در گروه تلگرامی رویداد
+              عضویت در گروه تلگرامی همنشینی
             </p>
             <span className="bg-white text-[#2AABEE] px-6 py-2 rounded-full font-bold text-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all">
               عضویت

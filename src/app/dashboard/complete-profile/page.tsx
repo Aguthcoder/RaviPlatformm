@@ -66,7 +66,7 @@ export default function CompleteProfilePage() {
             پروفایل شما کامل شد! 🎉
           </h1>
           <p className="text-slate-600 mb-6">
-            حالا می‌توانید در رویدادهای متناسب با شخصیت‌تان شرکت کنید.
+            حالا می‌توانید در همنشینیهای متناسب با شخصیت‌تان شرکت کنید.
           </p>
           <button
             onClick={() => (window.location.href = "/dashboard")}
@@ -88,7 +88,7 @@ export default function CompleteProfilePage() {
             تکمیل پروفایل
           </h1>
           <p className="text-slate-600">
-            برای پیشنهاد رویدادهای بهتر، لطفاً اطلاعات زیر را تکمیل کنید
+            برای پیشنهاد همنشینیهای بهتر، لطفاً اطلاعات زیر را تکمیل کنید
           </p>
         </div>
 
@@ -185,7 +185,7 @@ export default function CompleteProfilePage() {
                     <div className="w-5 h-5 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs ml-2 mt-0.5">
                       ✓
                     </div>
-                    <span>پیشنهاد رویدادهای متناسب با شخصیت شما</span>
+                    <span>پیشنهاد همنشینیهای متناسب با شخصیت شما</span>
                   </li>
                   <li className="flex items-start">
                     <div className="w-5 h-5 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs ml-2 mt-0.5">

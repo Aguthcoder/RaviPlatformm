@@ -9,11 +9,11 @@ export default function ExploreEvents() {
     <div className="max-w-5xl mx-auto">
       {/* Header & Search */}
       <div className="mb-8 space-y-4">
-        <h1 className="text-2xl font-black text-slate-900">کاوش رویدادها</h1>
+        <h1 className="text-2xl font-black text-slate-900">کاوش همنشینیها</h1>
         <div className="relative">
           <input
             type="text"
-            placeholder="جستجو در رویدادها..."
+            placeholder="جستجو در همنشینیها..."
             className="w-full bg-white border border-slate-200 rounded-xl py-3 pr-10 pl-4 text-sm outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
           />
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
