@@ -45,7 +45,7 @@ export default function FAQ() {
           <span className="text-orange-500 font-bold text-xs md:text-sm tracking-widest uppercase">
             سوالات متداول
           </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 mt-2 mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white mt-2 mb-4">
             پاسخ به رایج‌ترین پرسش‌ها
           </h2>
         </div>
@@ -56,13 +56,13 @@ export default function FAQ() {
             return (
               <div
                 key={item.question}
-                className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl shadow-sm overflow-hidden"
+                className="bg-slate-900/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-xl overflow-hidden"
               >
                 <button
                   onClick={() => handleFaqToggle(index)}
-                  className="w-full flex items-center justify-between text-right px-4 md:px-6 py-4 md:py-5 hover:bg-slate-50/50 transition-colors"
+                  className="w-full flex items-center justify-between text-right px-4 md:px-6 py-4 md:py-5 hover:bg-slate-800/60 transition-colors"
                 >
-                  <span className="text-slate-800 font-bold text-sm md:text-base lg:text-lg pr-2">
+                  <span className="text-white font-bold text-sm md:text-base lg:text-lg pr-2">
                     {item.question}
                   </span>
                   <ChevronDown
@@ -76,8 +76,8 @@ export default function FAQ() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <div className="px-4 md:px-6 pb-4 md:pb-6 pt-0 text-xs md:text-sm lg:text-base text-slate-600 leading-6 md:leading-7 lg:leading-8">
-                      <div className="border-t border-slate-100 pt-4 mt-2">
+                    <div className="px-4 md:px-6 pb-4 md:pb-6 pt-0 text-xs md:text-sm lg:text-base text-slate-200 leading-6 md:leading-7 lg:leading-8">
+                      <div className="border-t border-slate-700 pt-4 mt-2">
                         {item.answer}
                       </div>
                     </div>
