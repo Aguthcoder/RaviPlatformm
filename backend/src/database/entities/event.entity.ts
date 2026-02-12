@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { EventReservationEntity } from './event-reservation.entity';
+import { TelegramGroupEntity } from './telegram-group.entity';
 
 @Entity({ name: 'events' })
 export class EventEntity {
@@ -44,4 +45,7 @@ export class EventEntity {
 
   @OneToMany(() => EventReservationEntity, (reservation) => reservation.event)
   reservations?: EventReservationEntity[];
+
+  @OneToOne(() => TelegramGroupEntity, (telegramGroup) => telegramGroup.event)
+  telegramGroup?: TelegramGroupEntity;
 }
