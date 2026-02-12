@@ -38,7 +38,7 @@ export default function AboutPage() {
               درباره ما
             </Link>
             <Link href="/events" className="hover:text-slate-900 transition">
-              رویدادها
+              همنشینیها
             </Link>
           </nav>
 
@@ -262,7 +262,7 @@ export default function AboutPage() {
               </li>
               <li>
                 <Link href="/events" className="hover:text-orange-500 transition">
-                  رویدادها
+                  همنشینیها
                 </Link>
               </li>
             </ul>

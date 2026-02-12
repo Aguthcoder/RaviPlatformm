@@ -33,7 +33,7 @@ export default function ChatPage() {
   const [chats, setChats] = useState<ChatRoom[]>([
     {
       id: 1,
-      name: "رویداد استارتاپی",
+      name: "همنشینی استارتاپی",
       type: "group",
       avatarColor: "bg-orange-500",
       lastMessage: "سلام همه!",
@@ -41,7 +41,7 @@ export default function ChatPage() {
       messages: [
         {
           id: 1,
-          text: "سلام بچه‌ها! این رویداد عالی بود",
+          text: "سلام بچه‌ها! این همنشینی عالی بود",
           time: "10:30",
           isMe: false,
           senderName: "علی",

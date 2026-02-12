@@ -41,7 +41,7 @@ export default function Footer() {
             </li>
             <li>
               <Link href="/events" className="hover:text-orange-500 transition">
-                رویدادها
+                همنشینیها
               </Link>
             </li>
             <li>

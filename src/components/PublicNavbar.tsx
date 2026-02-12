@@ -38,7 +38,7 @@ export default function PublicNavbar() {
               href="/event"
               className="text-slate-600 hover:text-orange-600 font-medium"
             >
-              رویدادها
+              همنشینیها
             </Link>
           </div>
 

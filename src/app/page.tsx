@@ -95,7 +95,7 @@ export default function LandingPage() {
               </Link>
               <Link href="/events" className="w-full sm:w-auto">
                 <button className="bg-transparent border-2 border-white/80 text-white px-8 py-4 rounded-2xl font-bold text-base md:text-lg hover:bg-white/10 transition w-full">
-                  شرکت در رویداد بعدی
+                  شرکت در همنشینی بعدی
                 </button>
               </Link>
             </div>

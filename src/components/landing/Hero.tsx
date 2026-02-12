@@ -45,7 +45,7 @@ export default function Hero({ ctaHref }: HeroProps) {
             </Link>
             <Link href="/events" className="w-full sm:w-auto">
               <button className="w-full sm:w-auto bg-slate-900 text-white px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base hover:bg-slate-800 transition shadow-xl shadow-slate-200/50 hover:-translate-y-1">
-                مشاهده رویدادها
+                مشاهده همنشینیها
               </button>
             </Link>
           </div>
@@ -122,7 +122,7 @@ export default function Hero({ ctaHref }: HeroProps) {
         <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm rounded-[24px] md:rounded-[32px] p-6 md:p-8 border border-slate-200/80 shadow-xl shadow-slate-200/30">
           <div className="text-center mb-6 md:mb-8">
             <span className="text-orange-500 font-bold text-xs md:text-sm tracking-widest uppercase">
-              رویداد بعدی
+              همنشینی بعدی
             </span>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-black text-slate-900 mt-2">
               گردهمایی شب شناخت و دوستی
