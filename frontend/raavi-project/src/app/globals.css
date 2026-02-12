@@ -1,5 +1,5 @@
 /* src/app/globals.css */
-/* فونت وزیرمتن از CDN لود شده است */
+/* فونت وزیرمتن با next/font به‌صورت self-host لود می‌شود */
 
 @tailwind base;
 @tailwind components;
@@ -7,7 +7,7 @@
 
 :root {
   --font-vazirmatn:
-    "Estedad", "Vazirmatn Fallback", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue",
+    "Vazirmatn", "Vazirmatn Fallback", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 

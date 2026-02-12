@@ -1,3 +1,5 @@
+import axios, { AxiosError, AxiosHeaders } from 'axios';
+
 export type ApiEvent = {
   id: string;
   title: string;
@@ -47,38 +49,90 @@ export type UserProfile = {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 let accessToken: string | null = null;
+let isRefreshing = false;
+let queue: Array<(token: string | null) => void> = [];
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+function resolveQueue(token: string | null) {
+  queue.forEach((cb) => cb(token));
+  queue = [];
+}
+
+function normalizeError(error: AxiosError) {
+  const data = error.response?.data as { message?: string } | undefined;
+  const message = data?.message || error.message || 'API request failed';
+  return new Error(message);
+}
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
-async function apiRequest<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
-  const headers = new Headers(init.headers);
-  headers.set('Content-Type', 'application/json');
-  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers,
-    credentials: 'include',
-  });
-
-  if (response.status === 401 && retry) {
-    const refreshed = await refreshAccessToken();
-    if (refreshed) return apiRequest<T>(path, init, false);
+api.interceptors.request.use((config) => {
+  if (accessToken) {
+    const headers = config.headers instanceof AxiosHeaders ? config.headers : new AxiosHeaders(config.headers);
+    headers.set('Authorization', `Bearer ${accessToken}`);
+    config.headers = headers;
   }
 
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
+  return config;
+});
 
-  return response.json() as Promise<T>;
-}
+api.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config;
+
+    if (!originalRequest) {
+      throw normalizeError(error);
+    }
+
+    if (error.response?.status === 401 && !(originalRequest as { _retry?: boolean })._retry) {
+      (originalRequest as { _retry?: boolean })._retry = true;
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const token = await refreshAccessToken();
+          resolveQueue(token ? accessToken : null);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      return new Promise((resolve, reject) => {
+        queue.push((token) => {
+          if (!token) {
+            reject(normalizeError(error));
+            return;
+          }
+
+          const headers = originalRequest.headers instanceof AxiosHeaders
+            ? originalRequest.headers
+            : new AxiosHeaders(originalRequest.headers);
+          headers.set('Authorization', `Bearer ${token}`);
+          originalRequest.headers = headers;
+          resolve(api(originalRequest));
+        });
+      });
+    }
+
+    throw normalizeError(error);
+  }
+);
 
 export async function login(email: string, password: string) {
-  const data = await apiRequest<{ accessToken: string; user: { email: string; subscriptionPlan: string } }>('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
+  const { data } = await api.post<{ accessToken: string; user: { email: string; subscriptionPlan: string } }>('/auth/login', {
+    email,
+    password,
   });
 
   setAccessToken(data.accessToken);
@@ -87,54 +141,49 @@ export async function login(email: string, password: string) {
 
 export async function refreshAccessToken() {
   try {
-    const data = await apiRequest<{ accessToken: string }>('/auth/refresh', { method: 'POST' }, false);
+    const { data } = await api.post<{ accessToken: string }>('/auth/refresh');
     setAccessToken(data.accessToken);
     return true;
-  } catch {
+  } catch (error) {
+    console.error('Token refresh failed', error);
     setAccessToken(null);
     return false;
   }
 }
 
 export async function fetchEvents(params?: { category?: string; limit?: number }) {
-  const query = new URLSearchParams();
-  if (params?.category) query.set('category', params.category);
-  if (params?.limit) query.set('limit', String(params.limit));
-
-  const suffix = query.toString() ? `?${query.toString()}` : '';
-  const data = await apiRequest<{ count: number; events: ApiEvent[] }>(`/events${suffix}`);
+  const { data } = await api.get<{ count: number; events: ApiEvent[] }>('/events', { params });
   return data.events;
 }
 
 export async function reserveEvent(eventId: string, seats = 1, paymentReference?: string) {
-  return apiRequest<ReserveEventResponse>('/events/reserve', {
-    method: 'POST',
-    body: JSON.stringify({ eventId, seats, paymentReference }),
-  });
+  const { data } = await api.post<ReserveEventResponse>('/events/reserve', { eventId, seats, paymentReference });
+  return data;
 }
 
 export async function fetchNotifications() {
-  return apiRequest<{ unread: number; items: NotificationItem[] }>('/notifications');
+  const { data } = await api.get<{ unread: number; items: NotificationItem[] }>('/notifications');
+  return data;
 }
 
 export async function fetchSubscription() {
-  return apiRequest<{ plan: string; features: string[] }>('/subscriptions/me');
+  const { data } = await api.get<{ plan: string; features: string[] }>('/subscriptions/me');
+  return data;
 }
 
 export async function subscribe(provider: 'zarinpal' | 'stripe') {
-  return apiRequest<{ status: string; redirectUrl: string }>('/payments/subscribe', {
-    method: 'POST',
-    body: JSON.stringify({ provider }),
-  });
+  const { data } = await api.post<{ status: string; redirectUrl: string }>('/payments/subscribe', { provider });
+  return data;
 }
 
 export async function fetchUserProfile() {
-  return apiRequest<UserProfile>('/user/profile');
+  const { data } = await api.get<UserProfile>('/user/profile');
+  return data;
 }
 
 export async function updateUserProfile(payload: Partial<UserProfile>) {
-  return apiRequest<UserProfile & { usage: string; id: string }>('/user/profile', {
-    method: 'PUT',
-    body: JSON.stringify(payload),
-  });
+  const { data } = await api.put<UserProfile & { usage: string; id: string }>('/user/profile', payload);
+  return data;
 }
+
+export { api };
