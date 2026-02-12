@@ -34,10 +34,10 @@ export default function Features() {
           <span className="text-orange-500 font-bold text-sm md:text-base uppercase tracking-wide">
             چطور کار می‌کند؟
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mt-3 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mt-3 mb-4">
             فقط چند قدم تا یافتن هم‌نشین ایده‌آل
           </h2>
-          <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-slate-300 text-base md:text-lg max-w-2xl mx-auto">
             با تکنولوژی هوش مصنوعی و تست‌های روان‌شناختی، بهترین افراد را برای
             شما پیدا می‌کنیم
           </p>
@@ -51,14 +51,14 @@ export default function Features() {
               delay={idx * 0.1}
               className="group"
             >
-              <div className="bg-white/90 backdrop-blur-sm rounded-[24px] md:rounded-[32px] p-6 md:p-8 border border-slate-100/80 shadow-lg shadow-slate-200/30 hover:shadow-xl hover:shadow-orange-200/20 transition-all duration-300 hover:-translate-y-2 h-full flex flex-col">
+              <div className="bg-slate-900/95 backdrop-blur-sm rounded-[24px] md:rounded-[32px] p-6 md:p-8 border border-slate-700 shadow-xl shadow-slate-900/30 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 hover:-translate-y-2 h-full flex flex-col">
                 <div className="w-14 h-14 md:w-16 md:h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 mb-4 md:mb-6 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg md:text-xl font-black text-slate-900 mb-3">
+                <h3 className="text-lg md:text-xl font-black text-white mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-sm md:text-base text-slate-600 leading-relaxed flex-1">
+                <p className="text-sm md:text-base text-slate-300 leading-relaxed flex-1">
                   {feature.desc}
                 </p>
               </div>

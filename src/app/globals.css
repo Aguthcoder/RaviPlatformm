@@ -331,6 +331,40 @@ body {
 }
 
 
-.app-card { background:#0f172a; color:white; border:1px solid #1e293b; }
-.app-card h1,.app-card h2,.app-card h3,.app-card h4 { color:#f97316; }
+
+
+/* جلوه سه‌بعدی عمومی */
+button,
+[role="button"],
+a.inline-block,
+a[class*="rounded"] {
+  transform-style: preserve-3d;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+button:hover,
+[role="button"]:hover,
+a.inline-block:hover,
+a[class*="rounded"]:hover {
+  transform: translateY(-2px) rotateX(2deg);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.3);
+}
+
+button:active,
+[role="button"]:active,
+a.inline-block:active,
+a[class*="rounded"]:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.app-card {
+  background: #0f172a;
+  color: white;
+  border: 1px solid #1e293b;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.35);
+}
+.app-card:hover {
+  transform: translateY(-2px) rotateX(2deg);
+}
+.app-card h1,.app-card h2,.app-card h3,.app-card h4 { color:#fb923c; }
 input:focus,button:focus,select:focus,textarea:focus { outline:2px solid #f97316 !important; outline-offset:1px; }

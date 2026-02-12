@@ -45,7 +45,7 @@ export default function TestimonialsCarousel({
         <button
           onClick={handlePrev}
           disabled={isAnimating}
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur-sm border border-slate-200/80 text-slate-600 hover:text-white hover:bg-orange-500 hover:border-orange-500 transition-all duration-300 shadow-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-600 text-slate-200 hover:text-white hover:bg-orange-500 hover:border-orange-500 transition-all duration-300 shadow-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
           aria-label="نمایش قبلی"
         >
           <ArrowLeft className="mx-auto" size={16} />
@@ -56,7 +56,7 @@ export default function TestimonialsCarousel({
         <button
           onClick={handleNext}
           disabled={isAnimating}
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur-sm border border-slate-200/80 text-slate-600 hover:text-white hover:bg-orange-500 hover:border-orange-500 transition-all duration-300 shadow-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-600 text-slate-200 hover:text-white hover:bg-orange-500 hover:border-orange-500 transition-all duration-300 shadow-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
           aria-label="نمایش بعدی"
         >
           <ArrowRight className="mx-auto" size={16} />
@@ -68,7 +68,7 @@ export default function TestimonialsCarousel({
           <article
             key={`${item.id}-${index}-${cardIndex}`}
             className={cn(
-              "h-full rounded-2xl md:rounded-3xl border border-slate-100/80 bg-white/90 backdrop-blur-sm p-6 md:p-8 shadow-lg shadow-slate-200/30 flex flex-col justify-between",
+              "h-full rounded-2xl md:rounded-3xl border border-slate-700 bg-slate-900/95 backdrop-blur-sm p-6 md:p-8 shadow-xl shadow-slate-900/40 flex flex-col justify-between",
               "transition-all duration-500 ease-out",
               isAnimating
                 ? "opacity-0 translate-y-4"
@@ -83,14 +83,14 @@ export default function TestimonialsCarousel({
                 {item.initials}
               </div>
               <div>
-                <h4 className="text-sm md:text-base font-bold text-slate-900">
+                <h4 className="text-sm md:text-base font-bold text-white">
                   {item.name}
                 </h4>
                 <p className="text-xs md:text-sm text-slate-500">{item.role}</p>
               </div>
             </div>
 
-            <p className="text-xs md:text-sm leading-relaxed text-slate-600 flex-1">
+            <p className="text-xs md:text-sm leading-relaxed text-slate-300 flex-1">
               «{item.message}»
             </p>
 
@@ -103,7 +103,7 @@ export default function TestimonialsCarousel({
                     "text-orange-400 transition-all duration-300",
                     starIdx + 1 <= item.rating
                       ? "fill-orange-400"
-                      : "fill-slate-200 text-slate-300",
+                      : "fill-slate-700 text-slate-600",
                   )}
                 />
               ))}

@@ -14,7 +14,7 @@ export default function Header() {
   const isHomePage = pathname === "/";
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/70 backdrop-blur-lg z-40 border-b border-white/50 h-16 md:h-20 flex items-center shadow-sm">
+    <header className="fixed top-0 left-0 right-0 bg-slate-900/90 backdrop-blur-lg z-40 border-b border-slate-700 h-16 md:h-20 flex items-center shadow-sm">
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         {/* لوگو و اسم راوی با لینک به صفحه اصلی */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -22,10 +22,10 @@ export default function Header() {
             <Zap size={20} className="md:w-6 md:h-6" fill="currentColor" />
           </div>
           <div className="flex flex-col">
-            <span className="text-xl md:text-2xl font-black text-slate-800 tracking-tight group-hover:text-orange-600 transition-colors">
+            <span className="text-xl md:text-2xl font-black text-white tracking-tight group-hover:text-orange-600 transition-colors">
               راوی
             </span>
-            <span className="text-[10px] md:text-xs text-slate-400 hidden md:block">
+            <span className="text-[10px] md:text-xs text-slate-300 hidden md:block">
               صفحه اصلی
             </span>
           </div>
@@ -36,39 +36,39 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-2 mr-4">
             <Link
               href="/"
-              className="px-4 py-2 rounded-lg text-slate-600 hover:text-orange-600 hover:bg-orange-50 transition-colors text-sm font-medium border border-slate-200 hover:border-orange-200"
+              className="px-4 py-2 rounded-lg text-slate-200 hover:text-orange-400 hover:bg-slate-800 transition-colors text-sm font-medium border border-slate-600 hover:border-orange-300"
             >
               بازگشت به صفحه اصلی
             </Link>
           </div>
         )}
 
-        <nav className="hidden md:flex items-center gap-8 text-slate-500 font-medium">
+        <nav className="hidden md:flex items-center gap-8 text-slate-300 font-medium">
           <Link
             href="/"
             className={
               isHomePage
                 ? "text-orange-600 font-bold"
-                : "hover:text-slate-900 transition"
+                : "hover:text-orange-300 transition"
             }
           >
             خانه
           </Link>
-          <Link href="/about" className="hover:text-slate-900 transition">
+          <Link href="/about" className="hover:text-orange-300 transition">
             درباره ما
           </Link>
-          <Link href="/events" className="hover:text-slate-900 transition">
+          <Link href="/events" className="hover:text-orange-300 transition">
             رویدادها
           </Link>
           {isLoggedIn && (
             <>
               {/* <Link
                 href="/dashboard"
-                className="hover:text-slate-900 transition"
+                className="hover:text-orange-300 transition"
               >
                 داشبورد
               </Link> */}
-              <Link href="/chat" className="hover:text-slate-900 transition">
+              <Link href="/chat" className="hover:text-orange-300 transition">
                 چت‌ها
               </Link>
             </>
@@ -80,12 +80,12 @@ export default function Header() {
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard/profile"
-                className="text-slate-600 font-bold hover:text-slate-900"
+                className="text-slate-200 font-bold hover:text-orange-300"
               >
                 پروفایل
               </Link>
               <Link href="/dashboard">
-                <button className="bg-slate-900 text-white px-6 py-2.5 rounded-full font-bold hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                <button className="bg-slate-700 text-white px-6 py-2.5 rounded-full font-bold hover:bg-slate-600 transition shadow-lg shadow-slate-900/40">
                   داشبورد
                 </button>
               </Link>
@@ -94,7 +94,7 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="text-slate-600 font-bold hover:text-slate-900"
+                className="text-slate-200 font-bold hover:text-orange-300"
               >
                 ورود
               </Link>
@@ -109,7 +109,7 @@ export default function Header() {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 text-slate-600"
+          className="md:hidden p-2 text-slate-200"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -118,12 +118,12 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-white border-b border-slate-100 p-6 flex flex-col gap-4 shadow-xl md:hidden animate-in slide-in-from-top-5 z-50">
+        <div className="absolute top-16 left-0 right-0 bg-slate-900 border-b border-slate-700 p-6 flex flex-col gap-4 shadow-xl md:hidden animate-in slide-in-from-top-5 z-50">
           {/* دکمه بازگشت به صفحه اصلی در منوی موبایل - فقط اگر در صفحه اصلی نباشیم */}
           {!isHomePage && (
             <Link
               href="/"
-              className="text-orange-600 font-bold text-base flex items-center gap-2 py-2 border-b border-slate-100 pb-4"
+              className="text-orange-600 font-bold text-base flex items-center gap-2 py-2 border-b border-slate-700 pb-4"
               onClick={() => setMobileMenuOpen(false)}
             >
               بازگشت به صفحه اصلی
@@ -132,14 +132,14 @@ export default function Header() {
 
           <Link
             href="/about"
-            className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
+            className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
             onClick={() => setMobileMenuOpen(false)}
           >
             درباره ما
           </Link>
           <Link
             href="/events"
-            className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
+            className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
             onClick={() => setMobileMenuOpen(false)}
           >
             رویدادها
@@ -147,25 +147,25 @@ export default function Header() {
 
           {isLoggedIn ? (
             <>
-              <div className="border-t border-slate-200 pt-4 mt-2">
-                <p className="text-xs text-slate-400 mb-2">حساب کاربری</p>
+              <div className="border-t border-slate-700 pt-4 mt-2">
+                <p className="text-xs text-slate-300 mb-2">حساب کاربری</p>
                 <Link
                   href="/dashboard"
-                  className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
+                  className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   داشبورد
                 </Link>
                 <Link
                   href="/dashboard/profile"
-                  className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
+                  className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   پروفایل
                 </Link>
                 <Link
                   href="/chat"
-                  className="font-medium text-slate-700 text-base flex items-center gap-2 py-2"
+                  className="font-medium text-slate-100 text-base flex items-center gap-2 py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   چت‌ها
@@ -176,7 +176,7 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="font-medium text-slate-700 text-base py-2"
+                className="font-medium text-slate-100 text-base py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 ورود
