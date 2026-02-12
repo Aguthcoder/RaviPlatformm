@@ -554,3 +554,42 @@ COMMIT;
 -- ============================================
 -- END OF MIGRATION
 -- ============================================
+-- ============================================
+-- 9. AI RECOMMENDATION + TELEGRAM BOT TABLES
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS user_telegram_links (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    telegram_user_id BIGINT NOT NULL UNIQUE,
+    telegram_username VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT unique_user_telegram_link UNIQUE (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS telegram_group_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    telegram_chat_id BIGINT NOT NULL,
+    telegram_user_id BIGINT NOT NULL,
+    telegram_username VARCHAR(255),
+    message_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_telegram_group_messages_user_id
+ON telegram_group_messages (telegram_user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS event_recommendations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    recommendation_source VARCHAR(20) NOT NULL DEFAULT 'hybrid',
+    score FLOAT NOT NULL CHECK (score >= 0),
+    reason TEXT,
+    is_sent_to_telegram BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_recommendations_user_time
+ON event_recommendations (user_id, created_at DESC);
