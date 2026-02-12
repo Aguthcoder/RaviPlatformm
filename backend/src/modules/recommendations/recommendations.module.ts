@@ -4,6 +4,7 @@ import { EventRecommendationEntity } from '../../database/entities/event-recomme
 import { GroupMatchEntity } from '../../database/entities/group-match.entity';
 import { IntegrationsModule } from '../integrations/integrations.module';
 import { EventsModule } from '../events/events.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { TelegramModule } from '../telegram/telegram.module';
 import { UsersModule } from '../users/users.module';
 import { MatchController } from './match.controller';
@@ -15,6 +16,7 @@ import { RecommendationsService } from './recommendations.service';
     TypeOrmModule.forFeature([EventRecommendationEntity, GroupMatchEntity]),
     UsersModule,
     EventsModule,
+    NotificationsModule,
     TelegramModule,
     IntegrationsModule,
   ],

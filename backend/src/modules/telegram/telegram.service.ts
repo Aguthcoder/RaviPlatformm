@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { EventEntity } from '../../database/entities/event.entity';
 import { TelegramGroupMessageEntity } from '../../database/entities/telegram-group-message.entity';
 import { UserTelegramLinkEntity } from '../../database/entities/user-telegram-link.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 import { TelegramWebhookDto } from './dto';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class TelegramService {
     private readonly groupMessageRepository: Repository<TelegramGroupMessageEntity>,
     @InjectRepository(UserTelegramLinkEntity)
     private readonly userTelegramLinkRepository: Repository<UserTelegramLinkEntity>,
+    private readonly notificationsService: NotificationsService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -31,6 +33,25 @@ export class TelegramService {
       telegramUsername: payload.message.from.username,
       messageText: payload.message.text,
     });
+
+    const allLinkedUsers = await this.userTelegramLinkRepository.find({ select: ['userId', 'telegramUserId'] });
+    await Promise.all(
+      allLinkedUsers
+        .filter((link) => link.telegramUserId !== String(payload.message.from.id))
+        .slice(0, 100)
+        .map((link) =>
+          this.notificationsService.createNotification({
+            userId: link.userId,
+            type: 'message',
+            title: 'پیام جدید در گفت‌وگو',
+            body: `${payload.message.from.username ?? 'کاربر'}: ${payload.message.text.slice(0, 80)}`,
+            metadata: {
+              telegramChatId: String(payload.message.chat.id),
+              telegramUserId: String(payload.message.from.id),
+            },
+          }),
+        ),
+    );
   }
 
   async getUserKeywordSignals(userId: string): Promise<string[]> {

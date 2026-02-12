@@ -6,6 +6,7 @@ import { GroupMatchEntity } from '../../database/entities/group-match.entity';
 import { EventEntity } from '../../database/entities/event.entity';
 import { EventsService } from '../events/events.service';
 import { IntegrationsService } from '../integrations/integrations.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { TelegramService } from '../telegram/telegram.service';
 import { UsersService } from '../users/users.service';
 
@@ -20,6 +21,7 @@ export class RecommendationsService {
     private readonly eventsService: EventsService,
     private readonly telegramService: TelegramService,
     private readonly integrationsService: IntegrationsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async generateForUser(userId: string, sendToTelegram = false) {
@@ -108,6 +110,19 @@ export class RecommendationsService {
         }),
       ),
     );
+
+    if (results.length > 0) {
+      await this.notificationsService.createNotification({
+        userId,
+        type: 'match',
+        title: 'گروه‌های جدید برای شما پیدا شد',
+        body: `${results.length} پیشنهاد جدید آماده است. بالاترین امتیاز: ${results[0].event.title}`,
+        metadata: {
+          topEventId: results[0].event.id,
+          score: results[0].score,
+        },
+      });
+    }
 
     return {
       userId,
