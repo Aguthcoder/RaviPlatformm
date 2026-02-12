@@ -15,6 +15,15 @@ export class EventEntity {
   @Column({ name: 'category', nullable: true })
   category?: string;
 
+  @Column({ name: 'event_type', nullable: true, length: 50 })
+  eventType?: string;
+
+  @Column({ nullable: true, length: 100 })
+  city?: string;
+
+  @Column({ name: 'target_personality_traits', type: 'text', array: true, nullable: true })
+  targetPersonalityTraits?: string[];
+
   @Column({ name: 'tags', type: 'text', array: true, nullable: true })
   tags?: string[];
 

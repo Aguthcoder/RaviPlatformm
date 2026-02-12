@@ -22,6 +22,15 @@ export class ProfileEntity {
   @Column({ name: 'interests', type: 'text', array: true, nullable: true })
   interests?: string[];
 
+  @Column({ name: 'personality_type', nullable: true, length: 32 })
+  personalityType?: string;
+
+  @Column({ name: 'personality_traits', type: 'text', array: true, nullable: true })
+  personalityTraits?: string[];
+
+  @Column({ name: 'preferred_event_types', type: 'text', array: true, nullable: true })
+  preferredEventTypes?: string[];
+
   @Column({ nullable: true })
   city?: string;
 

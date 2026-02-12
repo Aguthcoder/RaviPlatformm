@@ -593,3 +593,35 @@ CREATE TABLE IF NOT EXISTS event_recommendations (
 
 CREATE INDEX IF NOT EXISTS idx_event_recommendations_user_time
 ON event_recommendations (user_id, created_at DESC);
+
+-- ============================================
+-- GROUP-BASED MATCHING ENGINE
+-- ============================================
+
+ALTER TABLE profiles
+    ADD COLUMN IF NOT EXISTS personality_type VARCHAR(32),
+    ADD COLUMN IF NOT EXISTS personality_traits TEXT[],
+    ADD COLUMN IF NOT EXISTS preferred_event_types TEXT[];
+
+ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS event_type VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS city VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS target_personality_traits TEXT[];
+
+CREATE TABLE IF NOT EXISTS group_matches (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    score FLOAT NOT NULL,
+    personality_score FLOAT NOT NULL,
+    interests_score FLOAT NOT NULL,
+    city_score FLOAT NOT NULL,
+    event_type_score FLOAT NOT NULL,
+    scoring_explanation TEXT NOT NULL,
+    scoring_breakdown JSONB NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_group_matches_user_id ON group_matches(user_id);
+CREATE INDEX IF NOT EXISTS idx_group_matches_event_id ON group_matches(event_id);
+CREATE INDEX IF NOT EXISTS idx_group_matches_score ON group_matches(score DESC);
