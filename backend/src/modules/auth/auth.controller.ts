@@ -1,49 +1,62 @@
-import { Body, Controller, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { RequestOtpDto } from './dto/request-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 
-function extractRefreshToken(cookieHeader?: string): string | null {
-  if (!cookieHeader) return null;
-
-  const item = cookieHeader
-    .split(';')
-    .map((part) => part.trim())
-    .find((part) => part.startsWith('refreshToken='));
-
-  return item ? decodeURIComponent(item.split('=')[1] ?? '') : null;
-}
+const isProduction = process.env.NODE_ENV === 'production';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
-  async login(@Body() body: LoginDto, @Res({ passthrough: true }) res: Response) {
-    const data = await this.authService.login(body.email, body.password);
+  @Post('request-otp')
+  requestOtp(@Body() body: RequestOtpDto) {
+    return this.authService.requestOtp(body.mobileNumber);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(@Body() body: VerifyOtpDto, @Res({ passthrough: true }) res: Response) {
+    const data = await this.authService.verifyOtp(body.mobileNumber, body.otp);
+
+    res.cookie('accessToken', data.accessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProduction,
+      path: '/',
+      maxAge: 15 * 60 * 1000,
+    });
 
     res.cookie('refreshToken', data.refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/api/auth/refresh',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: isProduction,
+      path: '/api/auth',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     return {
-      accessToken: data.accessToken,
+      message: 'ورود با موفقیت انجام شد.',
       user: data.user,
     };
   }
 
-  @Post('refresh')
-  refresh(@Req() req: { headers: { cookie?: string } }) {
-    const refreshToken = extractRefreshToken(req.headers.cookie);
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProduction,
+      path: '/',
+    });
 
-    if (!refreshToken) {
-      throw new UnauthorizedException('No refresh token cookie found');
-    }
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProduction,
+      path: '/api/auth',
+    });
 
-    return this.authService.refresh(refreshToken);
+    return this.authService.logout();
   }
 }

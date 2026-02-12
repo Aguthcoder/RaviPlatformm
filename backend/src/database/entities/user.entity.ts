@@ -12,8 +12,11 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ unique: true })
-  email!: string;
+  @Column({ unique: true, nullable: true })
+  email?: string | null;
+
+  @Column({ name: 'mobile_number', unique: true, nullable: true, length: 20 })
+  mobileNumber?: string | null;
 
   @Column({ name: 'password_hash', nullable: true })
   passwordHash?: string;
