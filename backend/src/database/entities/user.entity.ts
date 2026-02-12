@@ -4,6 +4,8 @@ import { UserTelegramLinkEntity } from './user-telegram-link.entity';
 import { EventReservationEntity } from './event-reservation.entity';
 import { SubscriptionEntity } from './subscription.entity';
 import { NotificationEntity } from './notification.entity';
+import { WalletEntity } from './wallet.entity';
+import { WalletTransactionEntity } from './wallet-transaction.entity';
 
 export type SubscriptionPlan = 'free' | 'premium';
 
@@ -41,4 +43,10 @@ export class UserEntity {
 
   @OneToMany(() => NotificationEntity, (notification) => notification.user)
   notifications?: NotificationEntity[];
+
+  @OneToOne(() => WalletEntity, (wallet) => wallet.user)
+  wallet?: WalletEntity;
+
+  @OneToMany(() => WalletTransactionEntity, (transaction) => transaction.user)
+  walletTransactions?: WalletTransactionEntity[];
 }

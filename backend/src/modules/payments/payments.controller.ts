@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtAuthGuard } from '../common/jwt-auth.guard';
@@ -21,6 +21,33 @@ export class PaymentsController {
       plan: user?.subscriptionPlan ?? 'free',
       features: user?.subscriptionPlan === 'premium' ? ['priority_events', 'unlimited_matches'] : ['basic_events'],
     };
+  }
+
+  @Get('wallet')
+  async wallet(@Req() req: { user: { sub: string } }) {
+    return this.paymentsService.getWallet(req.user.sub);
+  }
+
+  @Get('wallet/transactions')
+  async history(@Req() req: { user: { sub: string } }, @Query('limit') limit?: string) {
+    const parsed = limit ? Number(limit) : 50;
+    return this.paymentsService.getTransactionHistory(req.user.sub, parsed);
+  }
+
+  @Post('wallet/recharge')
+  async recharge(
+    @Req() req: { user: { sub: string } },
+    @Body() body: { amount: number; gateway?: 'zarinpal' | 'idpay'; callbackUrl?: string },
+  ) {
+    return this.paymentsService.rechargeWallet(req.user.sub, body.amount, body.gateway, body.callbackUrl);
+  }
+
+  @Post('wallet/pay')
+  async pay(
+    @Req() req: { user: { sub: string } },
+    @Body() body: { eventId: string; seats?: number },
+  ) {
+    return this.paymentsService.payForEvent(req.user.sub, body.eventId, body.seats ?? 1);
   }
 
   @Post('payments/subscribe')

@@ -44,6 +44,31 @@ export type UserProfile = {
   education: string | null;
 };
 
+
+export type WalletInfo = {
+  id: string;
+  userId: string;
+  balance: number;
+  currency: string;
+  updatedAt: string;
+};
+
+export type WalletTransaction = {
+  id: string;
+  userId: string;
+  eventId?: string;
+  type: 'recharge' | 'debit';
+  status: 'pending' | 'success' | 'failed';
+  amount: number;
+  balanceAfter?: number;
+  description?: string;
+  gateway?: string;
+  gatewayAuthority?: string;
+  gatewayReferenceId?: string;
+  callbackUrl?: string;
+  createdAt: string;
+};
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 let accessToken: string | null = null;
@@ -137,4 +162,30 @@ export async function updateUserProfile(payload: Partial<UserProfile>) {
     method: 'PUT',
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchWallet() {
+  return apiRequest<WalletInfo>('/wallet');
+}
+
+export async function rechargeWallet(payload: { amount: number; gateway?: 'zarinpal' | 'idpay'; callbackUrl?: string }) {
+  return apiRequest<{ message: string; paymentUrl: string; transaction: WalletTransaction }>('/wallet/recharge', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function payWithWallet(payload: { eventId: string; seats?: number }) {
+  return apiRequest<{
+    reservation: ReserveEventResponse['reservation'];
+    wallet: { balance: number; currency: string };
+    transaction: WalletTransaction;
+  }>('/wallet/pay', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchWalletTransactions(limit = 50) {
+  return apiRequest<WalletTransaction[]>(`/wallet/transactions?limit=${limit}`);
 }
