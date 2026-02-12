@@ -19,6 +19,16 @@ export type NotificationItem = {
   createdAt: string;
 };
 
+export type UserProfile = {
+  avatarUrl: string | null;
+  bio: string | null;
+  interests: string[];
+  city: string | null;
+  age: number | null;
+  gender: string | null;
+  education: string | null;
+};
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 let accessToken: string | null = null;
@@ -100,5 +110,16 @@ export async function subscribe(provider: 'zarinpal' | 'stripe') {
   return apiRequest<{ status: string; redirectUrl: string }>('/payments/subscribe', {
     method: 'POST',
     body: JSON.stringify({ provider }),
+  });
+}
+
+export async function fetchUserProfile() {
+  return apiRequest<UserProfile>('/user/profile');
+}
+
+export async function updateUserProfile(payload: Partial<UserProfile>) {
+  return apiRequest<UserProfile & { usage: string; id: string }>('/user/profile', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
   });
 }
