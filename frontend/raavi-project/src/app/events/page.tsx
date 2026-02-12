@@ -1,11 +1,52 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { Search, MapPin } from "lucide-react";
 import { categories, popularEvents } from "@/lib/events-catalog";
 import { getTopicImage } from "@/lib/dynamic-images";
+import { ApiEvent, fetchUpcomingEvents } from "@/lib/api";
 
 export default function EventsPage() {
+  const [query, setQuery] = useState("");
+  const [remoteEvents, setRemoteEvents] = useState<ApiEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        const events = await fetchUpcomingEvents({ limit: 8 });
+        if (isMounted) setRemoteEvents(events);
+      } catch {
+        if (isMounted) setRemoteEvents([]);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredRemoteEvents = useMemo(() => {
+    if (!query.trim()) return remoteEvents;
+    const text = query.trim().toLowerCase();
+
+    return remoteEvents.filter((event) =>
+      [event.title, event.description, event.category, ...(event.tags ?? [])]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(text)
+    );
+  }, [query, remoteEvents]);
+
   return (
     <div className="min-h-screen px-4 pt-6 pb-24 text-slate-100">
       <div className="mx-auto w-full max-w-xl">
@@ -15,6 +56,8 @@ export default function EventsPage() {
           <input
             type="text"
             placeholder="جست‌وجو"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
             className="w-full rounded-2xl border border-slate-700 bg-slate-900/90 py-4 pr-12 pl-4 text-sm text-slate-200 shadow-lg"
           />
           <Search className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
@@ -62,17 +105,31 @@ export default function EventsPage() {
         </section>
 
         <h2 className="mb-4 text-xl font-black text-slate-900">همنشینی‌های پرطرفدار</h2>
+
+        {isLoading ? <p className="mb-4 text-sm text-slate-600">در حال دریافت رویدادها...</p> : null}
+
         <section className="space-y-4">
-          {popularEvents.map((event) => (
-            <Link key={event.id} href={`/events/${event.id}/booking`} className="block overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-xl">
-              <img src={event.image} alt={event.title} className="h-44 w-full object-cover" />
-              <div className="p-4">
-                <h3 className="text-lg font-black leading-8 text-white">{event.title}</h3>
-                <p className="text-sm font-semibold text-slate-300">{event.time}</p>
-                <p className="mt-1 text-sm font-bold text-orange-400">(تکمیل ظرفیت)</p>
-              </div>
-            </Link>
-          ))}
+          {filteredRemoteEvents.length > 0
+            ? filteredRemoteEvents.map((event) => (
+                <Link key={event.id} href={`/events/${event.id}/booking`} className="block overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-xl">
+                  <img src={getTopicImage(event.title, 10, 1200, 600)} alt={event.title} className="h-44 w-full object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-lg font-black leading-8 text-white">{event.title}</h3>
+                    <p className="text-sm font-semibold text-slate-300">{new Date(event.startDate).toLocaleString("fa-IR")}</p>
+                    {event.category ? <p className="mt-1 text-sm font-bold text-orange-400">{event.category}</p> : null}
+                  </div>
+                </Link>
+              ))
+            : popularEvents.map((event) => (
+                <Link key={event.id} href={`/events/${event.id}/booking`} className="block overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 shadow-xl">
+                  <img src={event.image} alt={event.title} className="h-44 w-full object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-lg font-black leading-8 text-white">{event.title}</h3>
+                    <p className="text-sm font-semibold text-slate-300">{event.time}</p>
+                    <p className="mt-1 text-sm font-bold text-orange-400">(تکمیل ظرفیت)</p>
+                  </div>
+                </Link>
+              ))}
         </section>
       </div>
     </div>
