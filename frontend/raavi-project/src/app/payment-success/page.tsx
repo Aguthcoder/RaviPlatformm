@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Send } from "lucide-react";
 
-const TELEGRAM_LINK = "https://t.me/";
-
 export default function PaymentSuccessPage() {
+  const searchParams = useSearchParams();
+  const telegramLink = searchParams.get("telegramLink") ?? "https://t.me/";
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
       <div className="max-w-2xl w-full bg-white rounded-[40px] shadow-2xl border border-slate-100 p-8 md:p-16 text-center relative overflow-hidden">
@@ -23,13 +25,13 @@ export default function PaymentSuccessPage() {
         </p>
 
         <a
-          href={TELEGRAM_LINK}
+          href={telegramLink}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 bg-[#2AABEE] text-white px-8 py-4 rounded-2xl font-bold hover:bg-[#229ED9] transition"
         >
           <Send size={20} className="rotate-[-45deg]" />
-          انتقال به تلگرام
+          ورود به گروه تلگرام
         </a>
 
         <div className="mt-8">

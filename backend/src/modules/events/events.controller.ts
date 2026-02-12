@@ -26,8 +26,8 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   async reserve(
     @Req() req: { user: { sub: string } },
-    @Body() body: { eventId: string; seats?: number },
+    @Body() body: { eventId: string; seats?: number; paymentReference?: string },
   ) {
-    return this.eventsService.reserve(req.user.sub, body.eventId, body.seats ?? 1);
+    return this.eventsService.reserve(req.user.sub, body.eventId, body.seats ?? 1, body.paymentReference);
   }
 }

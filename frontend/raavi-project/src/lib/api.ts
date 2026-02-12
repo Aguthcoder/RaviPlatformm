@@ -10,6 +10,21 @@ export type ApiEvent = {
   price: number;
 };
 
+export type ReserveEventResponse = {
+  reservation: {
+    id: string;
+    eventId: string;
+    userId: string;
+    seats: number;
+    paymentStatus: 'pending' | 'paid' | 'failed';
+    paymentReference?: string;
+    paidAt?: string;
+    createdAt: string;
+  };
+  remaining: number;
+  telegramInviteLink: string;
+};
+
 export type NotificationItem = {
   id: string;
   type: 'match' | 'message' | 'event';
@@ -91,10 +106,10 @@ export async function fetchEvents(params?: { category?: string; limit?: number }
   return data.events;
 }
 
-export async function reserveEvent(eventId: string, seats = 1) {
-  return apiRequest('/events/reserve', {
+export async function reserveEvent(eventId: string, seats = 1, paymentReference?: string) {
+  return apiRequest<ReserveEventResponse>('/events/reserve', {
     method: 'POST',
-    body: JSON.stringify({ eventId, seats }),
+    body: JSON.stringify({ eventId, seats, paymentReference }),
   });
 }
 
