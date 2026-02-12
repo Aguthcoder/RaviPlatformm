@@ -1,30 +1,79 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDateString,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
-class TelegramChatDto {
-  @IsNumber()
-  id!: number;
+export class RegisterTelegramGroupDto {
+  @IsString()
+  telegramGroupId!: string;
 
   @IsString()
-  type!: string;
-}
-
-class TelegramFromDto {
-  @IsNumber()
-  id!: number;
+  title!: string;
 
   @IsOptional()
-  @IsString()
-  username?: string;
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  memberCount?: number | null;
+
+  @IsDateString()
+  registeredAt!: string;
 }
 
-class TelegramMessageDto {
-  chat!: TelegramChatDto;
-  from!: TelegramFromDto;
+export class SyncTelegramMessageDto {
+  @IsString()
+  id!: string;
 
   @IsString()
-  text!: string;
+  telegramGroupId!: string;
+
+  @IsString()
+  senderHash!: string;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(4096)
+  messageLength!: number;
+
+  @IsIn(['text', 'photo', 'video', 'voice', 'sticker', 'document', 'audio', 'other'])
+  messageType!: string;
+
+  @IsDateString()
+  createdAt!: string;
 }
 
-export class TelegramWebhookDto {
-  message!: TelegramMessageDto;
+export class CreateTelegramInviteDto {
+  @IsString()
+  telegramGroupId!: string;
+
+  @IsString()
+  userId!: string;
+
+  @IsDateString()
+  expiresAt!: string;
+
+  @IsBoolean()
+  singleUse!: boolean;
+}
+
+export class UseTelegramInviteDto {
+  @IsString()
+  telegramGroupId!: string;
+
+  @IsString()
+  userId!: string;
+
+  @IsString()
+  inviteLink!: string;
+
+  @IsDateString()
+  usedAt!: string;
 }
