@@ -1,12 +1,13 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../common/jwt-auth.guard';
 import { EventsService } from './events.service';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Get('upcoming')
-  async getUpcoming(
+  @Get()
+  async list(
     @Query('category') category?: string,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ) {
@@ -19,5 +20,14 @@ export class EventsController {
       count: events.length,
       events,
     };
+  }
+
+  @Post('reserve')
+  @UseGuards(JwtAuthGuard)
+  async reserve(
+    @Req() req: { user: { sub: string } },
+    @Body() body: { eventId: string; seats?: number },
+  ) {
+    return this.eventsService.reserve(req.user.sub, body.eventId, body.seats ?? 1);
   }
 }

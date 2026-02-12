@@ -5,24 +5,31 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { testimonialsData } from "@/lib/testimonials";
 import { useAppContext } from "@/context/AppContext";
-
-type Mode = "mobile" | "email";
+import { login } from "@/lib/api";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<Mode>("mobile");
-  const [otpStep, setOtpStep] = useState(false);
-  const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const { dispatch } = useAppContext();
   const router = useRouter();
 
   const randomComment = useMemo(() => testimonialsData[Math.floor(Math.random() * testimonialsData.length)], []);
 
-  const finishLogin = () => {
-    dispatch({ type: "LOGIN" });
-    router.push("/test");
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      await login(email, password);
+      dispatch({ type: "LOGIN" });
+      router.push("/dashboard");
+    } catch {
+      setError("ورود ناموفق بود. ایمیل/رمز عبور را بررسی کنید.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,53 +38,14 @@ export default function LoginPage() {
         <div className="p-6 md:p-14">
           <Link href="/" className="text-slate-500 text-sm">بازگشت به خانه</Link>
           <h1 className="text-4xl font-black mt-8 text-slate-900">خوش آمدید 👋</h1>
-          <p className="text-slate-500 mt-2">با ایمیل یا شماره موبایل وارد شوید</p>
+          <p className="text-slate-500 mt-2">ورود امن با JWT + Refresh Cookie</p>
 
-          <div className="mt-8 rounded-xl bg-slate-100 p-1 grid grid-cols-2">
-            <button className={`py-2 rounded-lg ${mode === "mobile" ? "bg-white font-bold" : "text-slate-500"}`} onClick={() => { setMode("mobile"); setOtpStep(false); }}>
-              ورود با موبایل
-            </button>
-            <button className={`py-2 rounded-lg ${mode === "email" ? "bg-white font-bold" : "text-slate-500"}`} onClick={() => setMode("email")}>
-              ورود با ایمیل
-            </button>
-          </div>
-
-          {mode === "email" && (
-            <form className="space-y-4 mt-6" onSubmit={(e) => { e.preventDefault(); finishLogin(); }}>
-              <input className="w-full bg-slate-100 rounded-xl p-4" placeholder="ایمیل" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input className="w-full bg-slate-100 rounded-xl p-4" placeholder="رمز عبور" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <button className="w-full bg-orange-500 text-white rounded-xl py-3 font-bold">ورود</button>
-            </form>
-          )}
-
-          {mode === "mobile" && !otpStep && (
-            <div className="space-y-4 mt-6">
-              <input className="w-full bg-slate-100 rounded-xl p-4" placeholder="شماره موبایل" value={mobile} onChange={(e) => setMobile(e.target.value)} />
-              <button className="w-full bg-orange-500 text-white rounded-xl py-3 font-bold" onClick={() => setOtpStep(true)}>ارسال کد تایید</button>
-            </div>
-          )}
-
-          {mode === "mobile" && otpStep && (
-            <div className="space-y-4 mt-6">
-              <p className="text-sm text-slate-500">کد تایید ارسال‌شده را وارد کنید</p>
-              <div className="flex gap-2">
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    maxLength={1}
-                    className="w-12 h-12 text-center bg-slate-100 rounded-xl"
-                    value={digit}
-                    onChange={(e) => {
-                      const copy = [...otp];
-                      copy[i] = e.target.value;
-                      setOtp(copy);
-                    }}
-                  />
-                ))}
-              </div>
-              <button className="w-full bg-orange-500 text-white rounded-xl py-3 font-bold" onClick={finishLogin}>تایید و ورود</button>
-            </div>
-          )}
+          <form className="space-y-4 mt-6" onSubmit={submit}>
+            <input className="w-full bg-slate-100 rounded-xl p-4" placeholder="ایمیل" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input className="w-full bg-slate-100 rounded-xl p-4" placeholder="رمز عبور" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            {error ? <p className="text-sm text-red-500">{error}</p> : null}
+            <button disabled={loading} className="w-full bg-orange-500 text-white rounded-xl py-3 font-bold disabled:opacity-60">{loading ? "در حال ورود..." : "ورود"}</button>
+          </form>
         </div>
 
         <div className="bg-slate-900 text-white p-8 md:p-12 flex flex-col justify-between">
