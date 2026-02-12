@@ -6,7 +6,10 @@ export default function DashboardPage() {
       <section className="app-card rounded-3xl p-6">
         <h2 className="text-2xl font-black">داشبورد همنشینی‌ها</h2>
         <p className="text-slate-200 mt-2">اطلاعات خصوصی همنشینی رزروشده (از جمله لوکیشن) فقط در این داشبورد نمایش داده می‌شود.</p>
-        <Link href="/events" className="inline-block mt-4 bg-orange-500 text-white px-5 py-2 rounded-xl">رفتن به رزرو</Link>
+        <div className="flex flex-wrap gap-3 mt-4">
+          <Link href="/events" className="inline-block bg-orange-500 text-white px-5 py-2 rounded-xl">رفتن به رزرو</Link>
+          <Link href="/" className="inline-block bg-white text-slate-900 px-5 py-2 rounded-xl border border-slate-200">بازگشت به صفحه اصلی</Link>
+        </div>
       </section>
 
       <section className="app-card rounded-3xl p-6">
