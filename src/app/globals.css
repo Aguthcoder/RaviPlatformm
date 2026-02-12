@@ -7,7 +7,7 @@
 
 :root {
   --font-vazirmatn:
-    "Vazirmatn", "Vazirmatn Fallback", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue",
+    "Estedad", "Vazirmatn Fallback", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
@@ -329,3 +329,8 @@ body {
   transform-origin: -5vw -14vh;
   box-shadow: 40vmin 0 5vmin currentColor;
 }
+
+
+.app-card { background:#0f172a; color:white; border:1px solid #1e293b; }
+.app-card h1,.app-card h2,.app-card h3,.app-card h4 { color:#f97316; }
+input:focus,button:focus,select:focus,textarea:focus { outline:2px solid #f97316 !important; outline-offset:1px; }
