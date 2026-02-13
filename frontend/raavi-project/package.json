@@ -7,7 +7,9 @@
     "build": "next build",
     "cf-build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "analyze": "ANALYZE=true next build",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
@@ -20,7 +22,8 @@
     "react-dom": "19.1.0",
     "react-intersection-observer": "^10.0.2",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "axios": "^1.11.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.9",
@@ -35,7 +38,9 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
     "typescript": "^5",
-    "wrangler": "^3.75.0"
+    "wrangler": "^3.75.0",
+    "@next/bundle-analyzer": "^15.4.4",
+    "next-pwa": "^5.6.0"
   },
   "engines": {
     "node": ">=18.0.0",

@@ -1,56 +1,59 @@
-version: '3.9'
+version: "3.9"
 
 services:
   backend:
+    image: ravi-backend:latest
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
       - .env
     ports:
-      - '4000:4000'
+      - "4000:4000"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - .:/app
-      - /app/node_modules
     restart: unless-stopped
+    networks:
+      - ravi_network
 
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ravi
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - '5432:5432'
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d ravi']
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
     restart: unless-stopped
+    networks:
+      - ravi_network
 
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
-    ports:
-      - '6379:6379'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
-      retries: 10
+      retries: 5
     restart: unless-stopped
+    networks:
+      - ravi_network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  ravi_network:
+    driver: bridge
