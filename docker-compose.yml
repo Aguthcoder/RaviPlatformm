@@ -1,47 +1,25 @@
-version: '3.9'
-
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - ./backend/.env
-    ports:
-      - '4000:4000'
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    restart: unless-stopped
-
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ravi
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - '5432:5432'
+      POSTGRES_DB: ${POSTGRES_DB:-ravi_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ravi_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d ravi']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-ravi_user} -d ${POSTGRES_DB:-ravi_db}']
       interval: 10s
       timeout: 5s
       retries: 10
     restart: unless-stopped
+    networks:
+      - app_network
 
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes
-    ports:
-      - '6379:6379'
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
     volumes:
       - redis_data:/data
     healthcheck:
@@ -50,7 +28,82 @@ services:
       timeout: 3s
       retries: 10
     restart: unless-stopped
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./nano.env
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - '4000'
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:4000/api/health']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./frontend/raavi-project
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://your-domain.com/api}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://your-domain.com}
+        NEXT_PUBLIC_ENV: ${NEXT_PUBLIC_ENV:-production}
+    env_file:
+      - ./nano.env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - '3000'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000').then(() => process.exit(0)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  app_network:
+    driver: bridge
