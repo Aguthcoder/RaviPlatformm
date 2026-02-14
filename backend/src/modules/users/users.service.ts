@@ -4,6 +4,19 @@ import { Repository } from 'typeorm';
 import { ProfileEntity } from '../../database/entities/profile.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
+export interface UserProfileView {
+  avatarUrl: string | null;
+  bio: string | null;
+  interests: string[];
+  personalityType: string | null;
+  personalityTraits: string[];
+  preferredEventTypes: string[];
+  city: string | null;
+  age: number | null;
+  gender: string | null;
+  education: string | null;
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -16,7 +29,7 @@ export class UsersService {
     return profile?.interests ?? [];
   }
 
-  async getProfile(userId: string) {
+  async getProfile(userId: string): Promise<UserProfileView> {
     const profile = await this.profileRepository.findOne({ where: { userId } });
 
     return {
@@ -44,7 +57,9 @@ export class UsersService {
       interests: payload.interests?.map((interest) => interest.trim()).filter(Boolean),
       personalityType: payload.personalityType?.trim().toLowerCase(),
       personalityTraits: payload.personalityTraits?.map((trait) => trait.trim().toLowerCase()).filter(Boolean),
-      preferredEventTypes: payload.preferredEventTypes?.map((eventType) => eventType.trim().toLowerCase()).filter(Boolean),
+      preferredEventTypes: payload.preferredEventTypes
+        ?.map((eventType) => eventType.trim().toLowerCase())
+        .filter(Boolean),
       city: payload.city,
       age: payload.age,
       gender: payload.gender?.toLowerCase(),

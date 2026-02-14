@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { MoreThan, Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository } from 'typeorm';
 import { OtpCodeEntity } from '../../database/entities/otp-code.entity';
 import { UserEntity } from '../../database/entities/user.entity';
 import { LoginDto } from './dto/login.dto';
@@ -78,7 +78,7 @@ export class AuthService {
   async verifyOtp(mobileNumber: string, otp: string) {
     const normalizedMobile = this.normalizeIranianMobile(mobileNumber);
     const otpEntry = await this.otpRepository.findOne({
-      where: { mobileNumber: normalizedMobile, consumedAt: null },
+      where: { mobileNumber: normalizedMobile, consumedAt: IsNull() },
       order: { createdAt: 'DESC' },
     });
 

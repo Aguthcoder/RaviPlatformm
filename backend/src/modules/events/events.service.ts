@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, MoreThan, Repository } from 'typeorm';
+import { EventEntity } from '../../database/entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
-import { EventEntity } from './entities/event.entity';
 
 @Injectable()
 export class EventsService {
@@ -41,8 +41,9 @@ export class EventsService {
     return event;
   }
 
-  getUpcomingActiveEvents(limit?: number): Promise<EventEntity[]> {
-    const normalizedLimit = Math.max(20, limit ?? 20);
+  getUpcomingActiveEvents(input?: number | { limit?: number }): Promise<EventEntity[]> {
+    const requestedLimit = typeof input === 'number' ? input : input?.limit;
+    const normalizedLimit = Math.max(20, requestedLimit ?? 20);
 
     return this.eventsRepository.find({
       where: {

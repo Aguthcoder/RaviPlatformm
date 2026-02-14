@@ -1,4 +1,12 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { EventReservationEntity } from './event-reservation.entity';
 import { TelegramGroupEntity } from './telegram-group.entity';
 
@@ -22,6 +30,15 @@ export class EventEntity {
   @Column({ nullable: true, length: 100 })
   city?: string;
 
+  @Column({ nullable: true, length: 255 })
+  location?: string;
+
+  @Column({ name: 'is_online', default: false })
+  isOnline!: boolean;
+
+  @Column({ name: 'instructor_name', nullable: true, length: 255 })
+  instructorName?: string | null;
+
   @Column({ name: 'target_personality_traits', type: 'text', array: true, nullable: true })
   targetPersonalityTraits?: string[];
 
@@ -44,7 +61,13 @@ export class EventEntity {
   startDate!: Date;
 
   @Column({ name: 'end_date', type: 'timestamp', nullable: true })
-  endDate?: Date;
+  endDate?: Date | null;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
 
   @OneToMany(() => EventReservationEntity, (reservation) => reservation.event)
   reservations?: EventReservationEntity[];
