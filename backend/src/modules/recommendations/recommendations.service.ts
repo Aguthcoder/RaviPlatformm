@@ -7,7 +7,7 @@ import { EventEntity } from '../../database/entities/event.entity';
 import { EventsService } from '../events/events.service';
 import { IntegrationsService } from '../integrations/integrations.service';
 import { TelegramService } from '../telegram/telegram.service';
-import { UsersService } from '../users/users.service';
+import { UserProfileView, UsersService } from '../users/users.service';
 
 @Injectable()
 export class RecommendationsService {
@@ -134,7 +134,7 @@ export class RecommendationsService {
     };
   }
 
-  private scoreEventForGroupMatch(profile: any, event: EventEntity) {
+  private scoreEventForGroupMatch(profile: UserProfileView, event: EventEntity) {
     const normalized = (items: string[] | null | undefined) =>
       (items ?? []).map((x) => x.toLowerCase().trim()).filter(Boolean);
 

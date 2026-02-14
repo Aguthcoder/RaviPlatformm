@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { CreateEventDto } from './dto/create-event.dto';
-import { EventEntity } from './entities/event.entity';
+import { EventEntity } from '../../database/entities/event.entity';
 import { EventsService } from './events.service';
 
 class ReserveEventDto {
