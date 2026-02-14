@@ -1,30 +1,55 @@
-import { Body, Controller, Get, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../common/jwt-auth.guard';
-import { CreateBookingDto } from './dto/create-booking.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { IsNotEmpty, IsUUID } from 'class-validator';
+import { CreateEventDto } from './dto/create-event.dto';
+import { EventEntity } from './entities/event.entity';
 import { EventsService } from './events.service';
+
+class ReserveEventDto {
+  @IsUUID()
+  @IsNotEmpty()
+  userId!: string;
+}
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+  @Post()
+  create(@Body() dto: CreateEventDto): Promise<EventEntity> {
+    return this.eventsService.create(dto);
+  }
+
   @Get()
-  async list(
-    @Query('category') category?: string,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-  ) {
-    const events = await this.eventsService.getUpcomingActiveEvents(category, limit);
-    return { count: events.length, events };
+  findAll(): Promise<EventEntity[]> {
+    return this.eventsService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('bookings')
-  createBooking(@Req() req: { user: { sub: string } }, @Body() body: CreateBookingDto) {
-    return this.eventsService.createBooking(req.user.sub, body.eventId);
+  @Get('upcoming')
+  getUpcoming(@Query('limit') limit?: string): Promise<EventEntity[]> {
+    const parsedLimit = Number.parseInt(limit ?? '', 10);
+    const safeLimit = Number.isNaN(parsedLimit) ? undefined : parsedLimit;
+
+    return this.eventsService.getUpcomingActiveEvents(safeLimit);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('bookings/me')
-  myBookings(@Req() req: { user: { sub: string } }) {
-    return this.eventsService.listMyBookings(req.user.sub);
+  @Get(':id')
+  findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<EventEntity> {
+    return this.eventsService.findOne(id);
+  }
+
+  @Post(':id/reserve')
+  reserve(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() body: ReserveEventDto,
+  ): Promise<EventEntity> {
+    return this.eventsService.reserve(id, body.userId);
   }
 }
