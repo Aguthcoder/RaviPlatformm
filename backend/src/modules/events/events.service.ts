@@ -1,68 +1,86 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { BookingEntity } from '../../database/entities/booking.entity';
-import { EventEntity } from '../../database/entities/event.entity';
+import { DataSource, MoreThan, Repository } from 'typeorm';
+import { CreateEventDto } from './dto/create-event.dto';
+import { EventEntity } from './entities/event.entity';
 
 @Injectable()
 export class EventsService {
   constructor(
     private readonly dataSource: DataSource,
     @InjectRepository(EventEntity)
-    private readonly eventRepository: Repository<EventEntity>,
-    @InjectRepository(BookingEntity)
-    private readonly bookingRepository: Repository<BookingEntity>,
+    private readonly eventsRepository: Repository<EventEntity>,
   ) {}
 
-  async getUpcomingActiveEvents(category?: string, limit = 50): Promise<EventEntity[]> {
-    const query = this.eventRepository
-      .createQueryBuilder('event')
-      .where('event.is_active = true')
-      .andWhere('event.start_date > NOW()')
-      .orderBy('event.start_date', 'ASC')
-      .limit(Math.max(1, Math.min(limit, 100)));
+  async create(dto: CreateEventDto): Promise<EventEntity> {
+    if (dto.endDate <= dto.startDate) {
+      throw new BadRequestException('endDate must be after startDate');
+    }
 
-    if (category) query.andWhere('event.category = :category', { category });
-    return query.getMany();
+    const event = this.eventsRepository.create({
+      ...dto,
+      reservedCount: dto.reservedCount ?? 0,
+      isOnline: dto.isOnline ?? false,
+      isActive: dto.isActive ?? true,
+    });
+
+    return this.eventsRepository.save(event);
   }
 
-  async createBooking(userId: string, eventId: string): Promise<BookingEntity> {
+  findAll(): Promise<EventEntity[]> {
+    return this.eventsRepository.find({
+      order: { startDate: 'ASC', createdAt: 'DESC' },
+    });
+  }
+
+  async findOne(id: string): Promise<EventEntity> {
+    const event = await this.eventsRepository.findOne({ where: { id } });
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+    return event;
+  }
+
+  getUpcomingActiveEvents(limit?: number): Promise<EventEntity[]> {
+    const normalizedLimit = Math.max(20, limit ?? 20);
+
+    return this.eventsRepository.find({
+      where: {
+        isActive: true,
+        startDate: MoreThan(new Date()),
+      },
+      order: { startDate: 'ASC' },
+      take: normalizedLimit,
+    });
+  }
+
+  async reserve(eventId: string, userId: string): Promise<EventEntity> {
+    if (!userId) {
+      throw new BadRequestException('userId is required');
+    }
+
     return this.dataSource.transaction(async (manager) => {
       const event = await manager.findOne(EventEntity, {
         where: { id: eventId },
         lock: { mode: 'pessimistic_write' },
       });
-      if (!event) throw new NotFoundException('Event not found');
-      if (!event.isActive) throw new BadRequestException('Event is inactive');
-      if (event.reservedCount >= event.capacity) throw new BadRequestException('Event capacity reached');
 
-      const existing = await manager.findOne(BookingEntity, {
-        where: { eventId, userId },
-      });
-      if (existing) throw new BadRequestException('User already has booking for this event');
+      if (!event) {
+        throw new NotFoundException('Event not found');
+      }
+
+      if (!event.isActive) {
+        throw new BadRequestException('Event is not active');
+      }
+
+      if (event.reservedCount >= event.capacity) {
+        throw new BadRequestException('Event is full');
+      }
 
       event.reservedCount += 1;
       await manager.save(event);
 
-      return manager.save(
-        manager.create(BookingEntity, {
-          eventId,
-          userId,
-          status: event.price > 0 ? 'pending' : 'confirmed',
-          paymentStatus: event.price > 0 ? 'unpaid' : 'paid',
-          amountPaid: event.price > 0 ? undefined : '0',
-          confirmedAt: event.price > 0 ? undefined : new Date(),
-          bookingCode: `RV-${Date.now().toString(36).toUpperCase()}`,
-        }),
-      );
-    });
-  }
-
-  listMyBookings(userId: string) {
-    return this.bookingRepository.find({
-      where: { userId },
-      relations: ['event'],
-      order: { createdAt: 'DESC' },
+      return event;
     });
   }
 }
